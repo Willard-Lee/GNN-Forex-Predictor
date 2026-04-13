@@ -10,13 +10,23 @@ cosine annealing, LayerNorm.
 from dataclasses import dataclass, field
 from typing import List
 
+from dataclasses import dataclass, field
+from typing import List
+import pandas as pd
+
 
 @dataclass
 class DataConfig:
     """Data pipeline configuration."""
+    
     csv_path: str = "data/EURUSD_daily.csv"
+    separator: str = "\t"
+    
+    # Standardized OHLCV names
     date_col: str = "Date"
-    ohlcv_cols: List[str] = field(default_factory=lambda: ["Open", "High", "Low", "Close", "Volume"])
+    ohlcv_cols: List[str] = field(default_factory=lambda: [
+        "Open", "High", "Low", "Close", "Volume"
+    ])
 
     # ── 25 technical indicator nodes ──
     # Momentum (10) | Volatility (6) | Trend (6) | Volume (3)
@@ -24,29 +34,59 @@ class DataConfig:
         # Momentum
         "RSI_14", "MACD", "MACD_Signal", "Stochastic_K", "Stochastic_D",
         "Williams_R", "CCI", "ROC", "MFI", "CMO",
+        
         # Volatility
         "ATR_14", "ATR_20", "BB_Width", "ADX", "NATR", "StdDev_20",
+        
         # Trend
-        "EMA_20", "EMA_50", "SMA_20", "SMA_50", "Ichimoku_Tenkan", "Ichimoku_Kijun",
+        "EMA_20", "EMA_50", "SMA_20", "SMA_50",
+        "Ichimoku_Tenkan", "Ichimoku_Kijun",
+        
         # Volume
         "OBV", "CMF", "AD_Line",
     ])
 
-    # Feature augmentation per node: raw, z-score, 3d slope, 5d vol → 4 dims
+    # Feature augmentation per node
     node_aug_dims: int = 4
 
-    # Splits (chronological walk-forward)
+    # Chronological walk-forward split
     train_ratio: float = 0.70
     val_ratio: float = 0.15
 
-    # Sequence length for temporal model
+    # Sequence length
     sequence_length: int = 30
 
     # Target engineering
-    direction_threshold: float = 0.002  # ±0.2% → up / flat / down (3-class)
+    direction_threshold: float = 0.002
     forecast_horizon: int = 1
 
 
+def load_forex_data(config: DataConfig) -> pd.DataFrame:
+    """Load EURUSD daily CSV and normalize column names."""
+    
+    df = pd.read_csv(config.csv_path, sep=config.separator)
+
+    # Normalize raw MetaTrader column names
+    rename_map = {
+        "<DATE>": "Date",
+        "<OPEN>": "Open",
+        "<HIGH>": "High",
+        "<LOW>": "Low",
+        "<CLOSE>": "Close",
+        "<TICKVOL>": "Volume"
+    }
+
+    df = df.rename(columns=rename_map)
+
+    # Keep only normalized OHLCV
+    required_cols = [config.date_col] + config.ohlcv_cols
+    df = df[required_cols].copy()
+
+    # Datetime conversion
+    df["Date"] = pd.to_datetime(df["Date"])
+    df = df.sort_values("Date").reset_index(drop=True)
+
+    return df
 @dataclass
 class GraphConfig:
     """Dynamic multi-edge graph construction."""

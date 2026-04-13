@@ -22,7 +22,19 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 def load_data(csv_path: str, date_col: str = "Date") -> pd.DataFrame:
     """Load OHLCV data from CSV and validate."""
-    df = pd.read_csv(csv_path, parse_dates=[date_col])
+    df = pd.read_csv(csv_path, sep="\t")
+    df = df.rename(columns={
+        "<DATE>": "Date",
+        "<OPEN>": "Open",
+        "<HIGH>": "High",
+        "<LOW>": "Low",
+        "<CLOSE>": "Close",
+        "<TICKVOL>": "Volume"
+    })
+    # Parse date AFTER rename
+    df[date_col] = pd.to_datetime(df[date_col])
+
+    # Sort and index
     df = df.sort_values(date_col).reset_index(drop=True)
     df = df.set_index(date_col)
 
