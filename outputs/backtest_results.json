@@ -1,0 +1,86 @@
+[
+  {
+    "name": "GAT-LSTM",
+    "total_return": 0.0,
+    "annualized_return": 0.0,
+    "annualized_volatility": 0.0,
+    "sharpe_ratio": 0,
+    "sortino_ratio": 0,
+    "max_drawdown": 0.0,
+    "calmar_ratio": 0,
+    "num_trades": 0,
+    "win_rate": 0.0,
+    "profit_factor": Infinity,
+    "avg_win": 0,
+    "avg_loss": 0,
+    "total_pnl": 0,
+    "num_trades_detail": {
+      "total": 0,
+      "wins": 0,
+      "losses": 0
+    }
+  },
+  {
+    "name": "LSTM Baseline",
+    "total_return": 0.0,
+    "annualized_return": 0.0,
+    "annualized_volatility": 0.0,
+    "sharpe_ratio": 0,
+    "sortino_ratio": 0,
+    "max_drawdown": 0.0,
+    "calmar_ratio": 0,
+    "num_trades": 0,
+    "win_rate": 0.0,
+    "profit_factor": Infinity,
+    "avg_win": 0,
+    "avg_loss": 0,
+    "total_pnl": 0,
+    "num_trades_detail": {
+      "total": 0,
+      "wins": 0,
+      "losses": 0
+    }
+  },
+  {
+    "name": "MA Crossover",
+    "total_return": -0.11342510168206747,
+    "annualized_return": -0.06984700659656418,
+    "annualized_volatility": 0.06274674475985528,
+    "sharpe_ratio": -1.113157453249297,
+    "sortino_ratio": -1.625760480826064,
+    "max_drawdown": 0.14950443016702522,
+    "calmar_ratio": -0.46719021314974835,
+    "num_trades": 7,
+    "win_rate": 0.0,
+    "profit_factor": 0.0,
+    "avg_win": 0,
+    "avg_loss": -1886.7656662793452,
+    "total_pnl": -13207.359663955416,
+    "num_trades_detail": {
+      "total": 7,
+      "wins": 0,
+      "losses": 7
+    }
+  },
+  {
+    "name": "Buy & Hold",
+    "total_return": -0.47381942910480235,
+    "annualized_return": -0.32035589385993846,
+    "annualized_volatility": 0.6294548779171517,
+    "sharpe_ratio": -0.508941792491921,
+    "sortino_ratio": -0.7787489874507072,
+    "max_drawdown": 0.6622370852827588,
+    "calmar_ratio": -0.48374804277708855,
+    "num_trades": 1,
+    "win_rate": 0.0,
+    "profit_factor": 0.0,
+    "avg_win": 0,
+    "avg_loss": -47381.94291048023,
+    "total_pnl": -47381.94291048023,
+    "num_trades_detail": {
+      "total": 1,
+      "wins": 0,
+      "losses": 1
+    }
+  }
+]

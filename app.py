@@ -1,5 +1,5 @@
 """
-Streamlit Dashboard — GAT-LSTM EUR/USD Forecasting System (v2).
+Streamlit Dashboard — GAT-LSTM EUR/USD Forecasting System 
 
 Run: streamlit run app.py
 Requires: outputs/ folder populated by `python main.py all`
@@ -66,30 +66,73 @@ with tab1:
     st.header("EUR/USD GAT-LSTM Forecasting — Overview")
 
     if data_ok:
-        df = pd.read_csv("data/EURUSD_daily.csv", parse_dates=["Date"]).sort_values("Date")
+        df = pd.read_csv("data/EURUSD_daily.csv", sep="\t")
+
+        df = df.rename(columns={
+            "<DATE>": "Date",
+            "<OPEN>": "Open",
+            "<HIGH>": "High",
+            "<LOW>": "Low",
+            "<CLOSE>": "Close",
+            "<TICKVOL>": "Volume"
+        })
+
+        df["Date"] = pd.to_datetime(df["Date"])
+        df = df.sort_values("Date").set_index("Date")
 
         c1, c2, c3, c4 = st.columns(4)
-        c1.metric("Data Period", f"{df['Date'].min().strftime('%Y-%m')} → {df['Date'].max().strftime('%Y-%m')}")
+
+        c1.metric(
+            "Data Period",
+            f"{df.index.min().strftime('%Y-%m')} → {df.index.max().strftime('%Y-%m')}"
+        )
         c2.metric("Total Days", f"{len(df):,}")
         c3.metric("Price Range", f"{df['Close'].min():.4f} – {df['Close'].max():.4f}")
         c4.metric("Latest Close", f"{df['Close'].iloc[-1]:.4f}")
 
         fig = go.Figure()
-        fig.add_trace(go.Scatter(x=df["Date"], y=df["Close"], mode="lines",
-                                 name="EUR/USD Close", line=dict(color="#2563eb", width=1.5)))
+        fig.add_trace(go.Scatter(
+            x=df.index,
+            y=df["Close"],
+            mode="lines",
+            name="EUR/USD Close",
+            line=dict(color="#2563eb", width=1.5)
+        ))
+
         n = len(df)
         te, ve = int(n * 0.70), int(n * 0.85)
-        fig.add_vrect(x0=df["Date"].iloc[0], x1=df["Date"].iloc[te],
-                      fillcolor="blue", opacity=0.04, annotation_text="Train", annotation_position="top left")
-        fig.add_vrect(x0=df["Date"].iloc[te], x1=df["Date"].iloc[ve],
-                      fillcolor="orange", opacity=0.07, annotation_text="Val")
-        fig.add_vrect(x0=df["Date"].iloc[ve], x1=df["Date"].iloc[-1],
-                      fillcolor="green", opacity=0.07, annotation_text="Test")
-        fig.update_layout(title="EUR/USD Daily Close with Data Splits",
-                          xaxis_title="Date", yaxis_title="Price", height=450, template="plotly_white")
+
+        fig.add_vrect(
+            x0=df.index[0], x1=df.index[te],
+            fillcolor="blue", opacity=0.04,
+            annotation_text="Train",
+            annotation_position="top left"
+        )
+
+        fig.add_vrect(
+            x0=df.index[te], x1=df.index[ve],
+            fillcolor="orange", opacity=0.07,
+            annotation_text="Val"
+        )
+
+        fig.add_vrect(
+            x0=df.index[ve], x1=df.index[-1],
+            fillcolor="green", opacity=0.07,
+            annotation_text="Test"
+        )
+
+        fig.update_layout(
+            title="EUR/USD Daily Close with Data Splits",
+            xaxis_title="Date",
+            yaxis_title="Price",
+            height=450,
+            template="plotly_white"
+        )
+
         st.plotly_chart(fig, use_container_width=True)
 
         st.subheader("25 Technical Indicator Nodes")
+
         ind_data = {
             "Category": ["Momentum"]*10 + ["Volatility"]*6 + ["Trend"]*6 + ["Volume"]*3,
             "Indicator": [
@@ -110,7 +153,9 @@ with tab1:
                 "On-Balance Volume", "Chaikin Money Flow", "Accumulation/Distribution Line",
             ],
         }
+
         st.dataframe(pd.DataFrame(ind_data), use_container_width=True, hide_index=True)
+
     else:
         st.warning("Place `EURUSD_daily.csv` in `data/` and run `python main.py all`.")
 
